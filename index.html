@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <!-- 모바일 대응을 위해 꼭 필요 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Firebase v9+ 회원가입 & 로그인</title>
+  <title>회원가입 & 로그인</title>
   <style>
     /* 전체 화면 기본 설정 */
     body {
@@ -80,16 +80,16 @@
     <!-- 회원가입 폼 -->
     <div class="form">
       <h3>회원가입</h3>
-      <input type="email" id="signup-email" placeholder="이메일 (example@test.com)" required>
-      <input type="password" id="signup-password" placeholder="비밀번호" required>
+      <input type="email" id="signup-email" placeholder="이메일 (example@test.com)" required />
+      <input type="password" id="signup-password" placeholder="비밀번호" required />
       <button id="signup-btn">회원가입</button>
     </div>
 
     <!-- 로그인 폼 -->
     <div class="form">
       <h3>로그인</h3>
-      <input type="email" id="login-email" placeholder="이메일 (example@test.com)" required>
-      <input type="password" id="login-password" placeholder="비밀번호" required>
+      <input type="email" id="login-email" placeholder="이메일 (example@test.com)" required />
+      <input type="password" id="login-password" placeholder="비밀번호" required />
       <button id="login-btn">로그인</button>
     </div>
   </div>
@@ -105,7 +105,7 @@
       signInWithEmailAndPassword
     } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
 
-    // === Firebase 설정 (본인 프로젝트 설정) ===
+    // === Firebase 설정 (본인 웹 앱 설정) ===
     const firebaseConfig = {
       apiKey: "AIzaSyBEB8oMfBuaPpIKAXIBCBRf1k22JTAAY1E",
       authDomain: "classpick-5e62c.firebaseapp.com",
@@ -118,35 +118,37 @@
 
     // Firebase 초기화
     const app = initializeApp(firebaseConfig);
-    // Analytics (선택사항)
     const analytics = getAnalytics(app);
-    // 인증 객체
     const auth = getAuth(app);
 
     // DOM 요소
     const signupBtn = document.getElementById("signup-btn");
     const loginBtn = document.getElementById("login-btn");
 
-    // 회원가입 함수
+    // 회원가입
     signupBtn.addEventListener("click", () => {
       const email = document.getElementById("signup-email").value;
       const password = document.getElementById("signup-password").value;
       createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           alert("회원가입 성공: " + userCredential.user.email);
+          // 회원가입 직후 메인 화면으로 이동하려면 아래 주석 해제
+          // window.location.href = "main.html";
         })
         .catch((error) => {
           alert("회원가입 실패: " + error.message);
         });
     });
 
-    // 로그인 함수
+    // 로그인
     loginBtn.addEventListener("click", () => {
       const email = document.getElementById("login-email").value;
       const password = document.getElementById("login-password").value;
       signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           alert("로그인 성공: " + userCredential.user.email);
+          // 로그인 성공 시 main.html로 이동
+          window.location.href = "main.html";
         })
         .catch((error) => {
           alert("로그인 실패: " + error.message);
