@@ -1,56 +1,34 @@
+<!DOCTYPE html><html><head><meta charset='UTF-8'><title>avatar_custom.html</title></head><body><h1>아바타 꾸미기</h1><ul id='user-list'><li>로딩 중...</li></ul>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
 
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8" />
-  <title>아바타 꾸미기</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { font-family: sans-serif; background: #f9f9f9; padding: 10px; text-align: center; }
-    h2 { color: #2c3e50; }
-    input { margin: 10px 0; }
-    img { width: 100px; height: 100px; border-radius: 50%; margin-top: 10px; }
-  </style>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBEB8oMfBuaPpIKAXIBCBRf1k22JTAAY1E",
-      authDomain: "classpick-5e62c.firebaseapp.com",
-      projectId: "classpick-5e62c"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-  </script>
-</head>
-<body>
-  <h2>아바타 꾸미기</h2>
-  <input type="text" id="avatarUrl" placeholder="아바타 이미지 URL 입력" /><br>
-  <button onclick="saveAvatar()">저장하기</button>
-  <div id="avatarDisplay"></div>
+const firebaseConfig = {
+  apiKey: "AIzaSyBEB8oMfBuaPpIKAXIBCBRf1k22JTAAY1E",
+  authDomain: "classpick-5e62c.firebaseapp.com",
+  projectId: "classpick-5e62c",
+  storageBucket: "classpick-5e62c.firebasestorage.app",
+  messagingSenderId: "545042496728",
+  appId: "1:545042496728:web:c2c71c0b3be403b2716bad",
+  measurementId: "G-BQF4L5PBJ7"
+};
 
-  <script>
-    auth.onAuthStateChanged(user => {
-      if (!user) return;
-      db.collection("users").doc(user.uid).get().then(doc => {
-        const data = doc.data();
-        if (data.avatarUrl) {
-          document.getElementById("avatarDisplay").innerHTML = "<img src='" + data.avatarUrl + "' />";
-        }
-      });
-    });
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-    function saveAvatar() {
-      const url = document.getElementById("avatarUrl").value.trim();
-      const user = auth.currentUser;
-      if (!user || !url) return;
-      db.collection("users").doc(user.uid).update({ avatarUrl: url }).then(() => {
-        document.getElementById("avatarDisplay").innerHTML = "<img src='" + url + "' />";
-        alert("저장 완료!");
-      });
-    }
-  </script>
-</body>
-</html>
+async function showUsers() {
+  const querySnapshot = await getDocs(collection(db, "users"));
+  const userList = document.getElementById("user-list");
+  if (!userList) return;
+  userList.innerHTML = "";
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    const li = document.createElement("li");
+    li.textContent = data.email;
+    userList.appendChild(li);
+  });
+}
+
+showUsers();
+</script>
+</body></html>
