@@ -2,135 +2,189 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>학교 이슈 게시판</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: sans-serif; padding: 20px; background: #f0f0f0; }
-    h2 { text-align: center; color: #2c3e50; }
-    .inputBox, .issueList, .issueDetail { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    input, textarea { width: 100%; margin-bottom: 10px; padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc; }
-    .issueItem { padding: 10px; border-bottom: 1px solid #ddd; cursor: pointer; }
-    .issueItem:hover { background: #f9f9f9; }
-    #status { font-size: 14px; color: gray; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+      background-color: #f0f0f0;
+      text-align: center;
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+    h2 { margin-bottom: 20px; color: #2c3e50; }
+
+    .box {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      text-align: left;
+    }
+    input, textarea {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 15px;
+      padding: 12px;
+      width: 100%;
+      background-color: #4CAF50;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .issue-item {
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+    #status {
+      font-size: 14px;
+      color: gray;
+      margin-top: 5px;
+    }
   </style>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js"></script>
 </head>
 
 <body>
-  <h2>학교 이슈 게시판</h2>
+  <div class="container">
+    <h2>학교 이슈 게시판</h2>
 
-  <!-- 글쓰기 -->
-  <div class="inputBox">
-    <h3>이슈 작성</h3>
-    <input type="text" id="title" placeholder="제목 입력">
-    <textarea id="content" rows="5" placeholder="내용 입력"></textarea>
-    <div id="status">자동 저장 대기 중...</div>
-  </div>
+    <!-- 작성 박스 -->
+    <div class="box">
+      <h3>이슈 작성</h3>
+      <input type="text" id="title" placeholder="제목 입력" />
+      <textarea id="content" rows="4" placeholder="내용 입력"></textarea>
+      <div id="status">자동 저장 대기 중...</div>
+      <button onclick="submitIssue()">작성 완료</button>
+    </div>
 
-  <!-- 이슈 목록 -->
-  <div class="issueList">
-    <h3>최근 이슈</h3>
-    <div id="issueContainer">불러오는 중...</div>
-  </div>
-
-  <!-- 이슈 상세 보기 -->
-  <div class="issueDetail" style="display:none;">
-    <h3>이슈 상세 보기</h3>
-    <div id="detailTitle"></div>
-    <div id="detailContent" style="margin-top:10px;"></div>
-    <div id="detailTime" style="font-size:12px; color:gray; margin-top:10px;"></div>
+    <!-- 이슈 목록 -->
+    <div class="box">
+      <h3>최근 이슈</h3>
+      <div id="issueList">불러오는 중...</div>
+    </div>
   </div>
 
   <script>
+    // Firebase 설정
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID"
+      apiKey: "AIzaSyBEB8oMfBuaPpIKAXIBCBRf1k22JTAAY1E",
+      authDomain: "classpick-5e62c.firebaseapp.com",
+      projectId: "classpick-5e62c",
+      storageBucket: "classpick-5e62c.firebasestorage.app",
+      messagingSenderId: "545042496728",
+      appId: "1:545042496728:web:bbae1d57038e5aa3716bad",
+      measurementId: "G-31BZ1Y7L9X"
     };
+
+    // Firebase 초기화
     firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+
     const auth = firebase.auth();
     const db = firebase.firestore();
 
     let currentUser;
-
-    auth.onAuthStateChanged(user => {
-      if (!user) {
-        alert("로그인 필요");
-        // 로그인 로직으로 이동하거나 임시 테스트용 유저 생성 가능
-      } else {
-        currentUser = user;
-        enableAutoSave(user.uid);
-        loadIssues();
-      }
+    auth.signInAnonymously().then(() => {
+      console.log("익명 로그인 성공");
+      currentUser = auth.currentUser;
+      enableAutoSave(currentUser.uid);
+      loadIssues();
+    }).catch(error => {
+      alert("로그인 실패: " + error.message);
     });
 
-    // 자동 저장 로직
+    // 자동 저장
     function enableAutoSave(uid) {
-      let saveTimeout;
+      let timeout;
       const titleInput = document.getElementById('title');
       const contentInput = document.getElementById('content');
       const status = document.getElementById('status');
 
-      function scheduleSave() {
-        clearTimeout(saveTimeout);
-        saveTimeout = setTimeout(() => {
-          const title = titleInput.value.trim();
-          const content = contentInput.value.trim();
-          if (title || content) {
-            db.collection("issues").add({
-              title,
-              content,
-              authorId: uid,
-              timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => {
-              status.innerText = "자동 저장 완료!";
-              setTimeout(() => { status.innerText = "자동 저장 대기 중..."; }, 2000);
-            }).catch(() => {
-              status.innerText = "저장 실패";
-            });
-          }
-        }, 3000); // 3초 후 자동 저장
+      function saveAuto() {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          saveIssue(uid, true); // 자동 저장
+        }, 3000);
       }
 
-      titleInput.addEventListener('input', scheduleSave);
-      contentInput.addEventListener('input', scheduleSave);
+      titleInput.addEventListener('input', saveAuto);
+      contentInput.addEventListener('input', saveAuto);
     }
 
-    // 이슈 목록 불러오기
+    // 작성 완료 버튼
+    function submitIssue() {
+      if (!currentUser) return alert("로그인 필요");
+      saveIssue(currentUser.uid, false); // 수동 저장
+    }
+
+    // 저장 함수 (자동 or 수동)
+    function saveIssue(uid, isAuto) {
+      const title = document.getElementById('title').value.trim();
+      const content = document.getElementById('content').value.trim();
+      const status = document.getElementById('status');
+
+      if (!title && !content) return;
+
+      db.collection("issues").add({
+        title,
+        content,
+        authorId: uid,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        status.innerText = isAuto ? "자동 저장 완료!" : "작성 완료!";
+        if (!isAuto) {
+          document.getElementById('title').value = "";
+          document.getElementById('content').value = "";
+        }
+        setTimeout(() => { status.innerText = "자동 저장 대기 중..."; }, 2000);
+      }).catch(() => {
+        status.innerText = "저장 실패!";
+      });
+    }
+
+    // 이슈 목록 표시
     function loadIssues() {
-      const issueContainer = document.getElementById('issueContainer');
+      const issueList = document.getElementById('issueList');
       db.collection("issues").orderBy("timestamp", "desc").limit(10)
         .onSnapshot(snapshot => {
           let html = "";
           snapshot.forEach(doc => {
             const data = doc.data();
             const time = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : "시간 없음";
-            html += `<div class="issueItem" onclick="showDetail('${doc.id}')">
+            html += `<div class="issue-item">
                       <strong>${data.title}</strong><br>
                       <span style="font-size:12px; color:gray;">${time}</span>
                     </div>`;
           });
-          issueContainer.innerHTML = html || "등록된 이슈가 없습니다.";
+          issueList.innerHTML = html || "등록된 이슈 없음";
+        }, err => {
+          issueList.innerText = "이슈 불러오기 실패";
+          console.error(err);
         });
-    }
-
-    // 이슈 상세 보기
-    function showDetail(id) {
-      const detailBox = document.querySelector('.issueDetail');
-      db.collection("issues").doc(id).get().then(doc => {
-        if (doc.exists) {
-          const data = doc.data();
-          document.getElementById('detailTitle').innerHTML = `<strong>${data.title}</strong>`;
-          document.getElementById('detailContent').innerText = data.content;
-          const time = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : "시간 없음";
-          document.getElementById('detailTime').innerText = `작성 시간: ${time}`;
-          detailBox.style.display = 'block';
-        }
-      });
     }
   </script>
 </body>
