@@ -1,0 +1,55 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>관리자 로그 기록</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: sans-serif; background: #f9f9f9; padding: 10px; }
+    h2 { text-align: center; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 8px; font-size: 14px; text-align: center; }
+    th { background: #e3f2fd; }
+  </style>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBEB8oMfBuaPpIKAXIBCBRf1k22JTAAY1E",
+      authDomain: "classpick-5e62c.firebaseapp.com",
+      projectId: "classpick-5e62c"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
+</head>
+<body>
+  <h2>관리자 조치 로그</h2>
+  <table>
+    <thead>
+      <tr><th>조치</th><th>대상 사용자</th><th>시간</th></tr>
+    </thead>
+    <tbody id="logTable">로딩 중...</tbody>
+  </table>
+
+  <script>
+    db.collection("logs").orderBy("time", "desc").limit(50).get().then(snapshot => {
+      let html = "";
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const time = data.time.toDate().toLocaleString();
+        html += `
+          <tr>
+            <td>${data.action}</td>
+            <td>${data.user}</td>
+            <td>${time}</td>
+          </tr>
+        `;
+      });
+      document.getElementById("logTable").innerHTML = html || "<tr><td colspan='3'>기록 없음</td></tr>";
+    });
+  </script>
+</body>
+</html>

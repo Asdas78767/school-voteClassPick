@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>익명 칭찬박스</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: sans-serif; background: #f9f9f9; margin: 0; padding: 10px; }
+    h2 { text-align: center; color: #2c3e50; }
+    .card { background: #ffffff; border-radius: 10px; padding: 10px; margin: 10px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    select, textarea, button { width: 100%; padding: 8px; margin-top: 8px; font-size: 14px; }
+    button { background: #4fc3f7; color: white; border: none; border-radius: 5px; }
+    .praise-msg { background: #e0f7fa; border-radius: 5px; padding: 5px; margin: 5px 0; }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBEB8oMfBuaPpIKAXIBCBRf1k22JTAAY1E",
+      authDomain: "classpick-5e62c.firebaseapp.com",
+      projectId: "classpick-5e62c"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
+</head>
+<body>
+  <h2>익명 칭찬박스</h2>
+
+  <div class="card">
+    <h3>칭찬 메시지 보내기</h3>
+    <select id="candidateSelect">불러오는 중...</select>
+    <textarea id="messageInput" placeholder="칭찬 내용을 입력하세요"></textarea>
+    <button onclick="sendPraise()">보내기</button>
+  </div>
+
+  <div class="card">
+    <h3>받은 칭찬 보기</h3>
+    <select id="viewSelect" onchange="loadPraises()">후보 선택</select>
+    <div id="praiseList">메시지를 선택하세요</div>
+  </div>
+
+  <script>
+    let candidates = [];
+    db.collection("users").get().then(snapshot => {
+      let options = "";
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        candidates.push({ id: doc.id, name: data.name });
+        options += `<option value="${doc.id}">${data.name}</option>`;
+      });
+      document.getElementById("candidateSelect").innerHTML = options;
+      document.getElementById("viewSelect").innerHTML = options;
+    });
+
+    function sendPraise() {
+      const candidateId = document.getElementById("candidateSelect").value;
+      const message = document.getElementById("messageInput").value.trim();
+      if (!message) return alert("메시지를 입력하세요.");
+      db.collection("praises").add({
+        candidateId,
+        message,
+        time: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        alert("칭찬이 전송되었습니다!");
+        document.getElementById("messageInput").value = "";
+      });
+    }
+
+    function loadPraises() {
+      const candidateId = document.getElementById("viewSelect").value;
+      db.collection("praises").where("candidateId", "==", candidateId)
+        .orderBy("time", "desc").limit(10).get().then(snapshot => {
+          let html = "";
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            html += `<div class="praise-msg">${data.message}</div>`;
+          });
+          document.getElementById("praiseList").innerHTML = html || "칭찬이 없습니다.";
+        });
+    }
+  </script>
+</body>
+</html>

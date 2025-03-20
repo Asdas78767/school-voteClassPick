@@ -1,0 +1,46 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>포인트 & 배지</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: sans-serif; background: #f0f8ff; padding: 10px; text-align: center; }
+    h2 { color: #2c3e50; }
+    .info { margin: 10px; font-size: 16px; }
+    .badge { display: inline-block; background: gold; color: black; padding: 5px 10px; margin: 5px; border-radius: 8px; font-weight: bold; }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBEB8oMfBuaPpIKAXIBCBRf1k22JTAAY1E",
+      authDomain: "classpick-5e62c.firebaseapp.com",
+      projectId: "classpick-5e62c"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+  </script>
+</head>
+<body>
+  <h2>내 포인트 & 배지</h2>
+  <div class="info" id="pointInfo">포인트: 로딩 중...</div>
+  <div class="info" id="badgeInfo">보유 배지: 로딩 중...</div>
+
+  <script>
+    auth.onAuthStateChanged(user => {
+      if (!user) return alert("로그인 필요");
+      db.collection("users").doc(user.uid).get().then(doc => {
+        const data = doc.data();
+        document.getElementById("pointInfo").innerText = "포인트: " + (data.points || 0) + "P";
+        const badges = data.badges || [];
+        const badgeHTML = badges.map(b => "<span class='badge'>" + b + "</span>").join("");
+        document.getElementById("badgeInfo").innerHTML = badgeHTML || "없음";
+      });
+    });
+  </script>
+</body>
+</html>

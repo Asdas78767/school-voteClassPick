@@ -1,0 +1,50 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>투표 결과 인포그래픽</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>body { font-family: sans-serif; background: #fff; text-align: center; padding: 10px; }</style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBEB8oMfBuaPpIKAXIBCBRf1k22JTAAY1E",
+      authDomain: "classpick-5e62c.firebaseapp.com",
+      projectId: "classpick-5e62c"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
+</head>
+<body>
+  <h2>투표 결과 인포그래픽</h2>
+  <canvas id="voteChart" width="300" height="300"></canvas>
+  <script>
+    db.collection("votes").get().then(snapshot => {
+      const counts = {};
+      snapshot.forEach(doc => {
+        const id = doc.data().candidateId;
+        counts[id] = (counts[id] || 0) + 1;
+      });
+      db.collection("users").get().then(userSnap => {
+        const labels = [];
+        const data = [];
+        const idToName = {};
+        userSnap.forEach(doc => idToName[doc.id] = doc.data().name);
+        for (let id in counts) {
+          labels.push(idToName[id] || "미확인");
+          data.push(counts[id]);
+        }
+        new Chart(document.getElementById("voteChart"), {
+          type: "bar",
+          data: { labels, datasets: [{ label: "득표 수", data }] },
+          options: { responsive: true, plugins: { legend: { display: false } } }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

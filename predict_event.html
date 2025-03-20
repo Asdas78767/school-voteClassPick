@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>예측왕 이벤트</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: sans-serif; background: #f9f9f9; margin: 0; padding: 10px; }
+    h2 { text-align: center; color: #2c3e50; }
+    .card { background: #ffffff; border-radius: 10px; padding: 10px; margin: 10px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    select, button { width: 100%; padding: 8px; margin-top: 8px; font-size: 14px; }
+    button { background: #4fc3f7; color: white; border: none; border-radius: 5px; }
+    .result { margin-top: 10px; color: green; text-align: center; }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBEB8oMfBuaPpIKAXIBCBRf1k22JTAAY1E",
+      authDomain: "classpick-5e62c.firebaseapp.com",
+      projectId: "classpick-5e62c"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+  </script>
+</head>
+<body>
+  <h2>예측왕 이벤트</h2>
+
+  <div class="card">
+    <h3>최종 우승자 예측하기</h3>
+    <select id="predictSelect">불러오는 중...</select>
+    <button onclick="submitPrediction()">예측 제출</button>
+    <div class="result" id="predictResult"></div>
+  </div>
+
+  <script>
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        alert("로그인이 필요합니다.");
+        return;
+      }
+
+      db.collection("users").get().then(snapshot => {
+        let options = "";
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          options += `<option value="${doc.id}">${data.name}</option>`;
+        });
+        document.getElementById("predictSelect").innerHTML = options;
+      });
+    });
+
+    function submitPrediction() {
+      const selectedId = document.getElementById("predictSelect").value;
+      const user = auth.currentUser;
+      if (!user) return alert("로그인 후 이용하세요.");
+      db.collection("predictions").doc(user.uid).set({
+        voterId: user.uid,
+        candidateId: selectedId,
+        time: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        document.getElementById("predictResult").innerText = "예측 완료! 결과 발표를 기다려주세요.";
+      });
+    }
+  </script>
+</body>
+</html>
