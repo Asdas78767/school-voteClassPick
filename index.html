@@ -3,30 +3,45 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>로그인</title>
+  <title>회원가입 및 로그인</title>
   <style>
     body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
     input { padding: 10px; margin: 5px; width: 200px; }
     button { padding: 10px 20px; margin-top: 10px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
     button:hover { background-color: #45a049; }
+    .container { display: flex; justify-content: center; margin-top: 20px; }
+    .form { margin: 0 20px; border: 1px solid #ccc; padding: 20px; border-radius: 10px; }
   </style>
 </head>
 <body>
-  <h2>로그인</h2>
-  <input type="email" id="email" placeholder="이메일" required><br>
-  <input type="password" id="password" placeholder="비밀번호" required><br>
-  <button onclick="logIn()">로그인</button>
-
-  <!-- compat 버전 스크립트 -->
+  <h2>회원가입 및 로그인</h2>
+  <div class="container">
+    <!-- 회원가입 폼 -->
+    <div class="form">
+      <h3>회원가입</h3>
+      <input type="email" id="signup-email" placeholder="이메일" required><br>
+      <input type="password" id="signup-password" placeholder="비밀번호" required><br>
+      <button onclick="signUp()">회원가입</button>
+    </div>
+    <!-- 로그인 폼 -->
+    <div class="form">
+      <h3>로그인</h3>
+      <input type="email" id="login-email" placeholder="이메일" required><br>
+      <input type="password" id="login-password" placeholder="비밀번호" required><br>
+      <button onclick="logIn()">로그인</button>
+    </div>
+  </div>
+  
+  <!-- Firebase compat 스크립트 -->
   <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
   <script>
-    // Firebase 설정 (회원가입 때 사용한 설정과 동일)
+    // Firebase 설정 (자신의 Firebase 콘솔 설정에 맞게 수정)
     const firebaseConfig = {
       apiKey: "AIzaSyBEB8oMfBuaPpIKAXIBCBRf1k22JTAAY1E",
       authDomain: "classpick-5e62c.firebaseapp.com",
       projectId: "classpick-5e62c",
-      storageBucket: "classpick-5e62c.appspot.com", // 수정된 storageBucket 값
+      storageBucket: "classpick-5e62c.appspot.com", // 올바른 storageBucket 값
       messagingSenderId: "545042496728",
       appId: "1:545042496728:web:96cd5e5ca4c0b465716bad",
       measurementId: "G-GHS8YZSZVP"
@@ -36,17 +51,28 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
+    // 회원가입 함수
+    function signUp() {
+      const email = document.getElementById("signup-email").value;
+      const password = document.getElementById("signup-password").value;
+      auth.createUserWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        alert("회원가입 성공: " + userCredential.user.email);
+      })
+      .catch((error) => {
+        alert("회원가입 실패: " + error.message);
+      });
+    }
+    
     // 로그인 함수
     function logIn() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+      const email = document.getElementById("login-email").value;
+      const password = document.getElementById("login-password").value;
       auth.signInWithEmailAndPassword(email, password)
       .then((userCredential) => {
-        // 로그인 성공
         alert("로그인 성공: " + userCredential.user.email);
       })
       .catch((error) => {
-        // 오류 처리
         alert("로그인 실패: " + error.message);
       });
     }
