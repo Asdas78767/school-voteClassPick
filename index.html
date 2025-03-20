@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <!-- 모바일 대응을 위해 꼭 필요 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>모바일 회원가입 & 로그인</title>
+  <title>Firebase v9+ 회원가입 & 로그인</title>
   <style>
     /* 전체 화면 기본 설정 */
     body {
@@ -82,7 +82,7 @@
       <h3>회원가입</h3>
       <input type="email" id="signup-email" placeholder="이메일 (example@test.com)" required>
       <input type="password" id="signup-password" placeholder="비밀번호" required>
-      <button onclick="signUp()">회원가입</button>
+      <button id="signup-btn">회원가입</button>
     </div>
 
     <!-- 로그인 폼 -->
@@ -90,54 +90,68 @@
       <h3>로그인</h3>
       <input type="email" id="login-email" placeholder="이메일 (example@test.com)" required>
       <input type="password" id="login-password" placeholder="비밀번호" required>
-      <button onclick="logIn()">로그인</button>
+      <button id="login-btn">로그인</button>
     </div>
   </div>
 
-  <!-- Firebase compat 스크립트 -->
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
-  <script>
-    // === Firebase 콘솔의 프로젝트 설정(스크린샷) 참고하여 자동 입력 ===
+  <!-- Firebase v9+ 모듈 스크립트 (type="module") -->
+  <script type="module">
+    // Firebase SDKs
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-analytics.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword
+    } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+
+    // === Firebase 설정 (본인 프로젝트 설정) ===
     const firebaseConfig = {
       apiKey: "AIzaSyBEB8oMfBuaPpIKAXIBCBRf1k22JTAAY1E",
       authDomain: "classpick-5e62c.firebaseapp.com",
       projectId: "classpick-5e62c",
-      storageBucket: "classpick-5e62c.appspot.com",
+      storageBucket: "classpick-5e62c.firebasestorage.app",
       messagingSenderId: "545042496728",
-      appId: "1:545042496728:web:96cd5e5ca4c0b465716bad",
-      measurementId: "G-GHS8YZSZVP" // 콘솔에서 Analytics 사용 중이라면 이 값도 표시됨
+      appId: "1:545042496728:web:c2c71c0b3be403b2716bad",
+      measurementId: "G-BQF4L5PBJ7"
     };
 
     // Firebase 초기화
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
+    const app = initializeApp(firebaseConfig);
+    // Analytics (선택사항)
+    const analytics = getAnalytics(app);
+    // 인증 객체
+    const auth = getAuth(app);
+
+    // DOM 요소
+    const signupBtn = document.getElementById("signup-btn");
+    const loginBtn = document.getElementById("login-btn");
 
     // 회원가입 함수
-    function signUp() {
+    signupBtn.addEventListener("click", () => {
       const email = document.getElementById("signup-email").value;
       const password = document.getElementById("signup-password").value;
-      auth.createUserWithEmailAndPassword(email, password)
+      createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           alert("회원가입 성공: " + userCredential.user.email);
         })
         .catch((error) => {
           alert("회원가입 실패: " + error.message);
         });
-    }
+    });
 
     // 로그인 함수
-    function logIn() {
+    loginBtn.addEventListener("click", () => {
       const email = document.getElementById("login-email").value;
       const password = document.getElementById("login-password").value;
-      auth.signInWithEmailAndPassword(email, password)
+      signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           alert("로그인 성공: " + userCredential.user.email);
         })
         .catch((error) => {
           alert("로그인 실패: " + error.message);
         });
-    }
+    });
   </script>
 </body>
 </html>
