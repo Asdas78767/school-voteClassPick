@@ -32,7 +32,7 @@
     };
 
     // Firebase 초기화
-    firebase.initializeApp(firebaseConfig);
+    const app = firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
     // 회원가입 함수
@@ -40,14 +40,13 @@
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
 
-      // Firebase Auth로 이메일/비밀번호로 사용자 생성
       auth.createUserWithEmailAndPassword(email, password)
-        .then(userCredential => {
+        .then((userCredential) => {
           // 회원가입 성공
           alert("회원가입 성공: " + userCredential.user.email);
         })
-        .catch(error => {
-          // 오류 발생 시 메시지 출력
+        .catch((error) => {
+          // 오류 처리
           alert("회원가입 실패: " + error.message);
         });
     }
