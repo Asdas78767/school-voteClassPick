@@ -38,7 +38,7 @@
     }
     button {
       margin-top: 10px;
-      padding: 10px;
+      padding: 12px;
       width: 100%;
       background-color: #4CAF50;
       color: white;
@@ -119,6 +119,7 @@
     const adminEmail = "mingyeolkim637@gmail.com";
     let currentUser = null;
 
+    // 로그인 기능
     function login() {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
@@ -136,6 +137,7 @@
         });
     }
 
+    // 자동 저장 기능
     function enableAutoSave(uid) {
       let timeout;
       const titleInput = document.getElementById('title');
@@ -192,7 +194,6 @@
             const time = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : "시간 없음";
             let deleteBtn = "";
 
-            // 관리자일 경우 삭제 버튼 표시
             if (currentUser && currentUser.email === adminEmail) {
               deleteBtn = `<button class="delete-btn" onclick="deleteIssue('${doc.id}')">삭제</button>`;
             }
