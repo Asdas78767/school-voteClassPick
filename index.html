@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>로그인 및 회원가입</title>
+  <title>회원가입 및 로그인</title>
   <style>
     body {
       margin: 0;
@@ -54,11 +54,22 @@
     .form button:hover {
       background-color: #45a049;
     }
+    ul#user-list {
+      list-style: none;
+      padding: 0;
+    }
+    ul#user-list li {
+      background: #fff;
+      margin: 5px 0;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>로그인 및 회원가입</h2>
+    <h2>회원가입 및 로그인</h2>
 
     <!-- 회원가입 폼 -->
     <div class="form">
@@ -75,14 +86,21 @@
       <input type="password" id="login-password" placeholder="비밀번호" required />
       <button id="login-btn">로그인</button>
     </div>
+
+    <!-- 회원 목록 표시 -->
+    <div class="form">
+      <h3>회원 목록</h3>
+      <ul id="user-list"><li>로딩 중...</li></ul>
+    </div>
   </div>
 
   <!-- Firebase SDK v9+ 모듈 방식 -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
 
-    // Firebase 설정 (본인 프로젝트 정보 정확히 입력!)
+    // Firebase 설정
     const firebaseConfig = {
       apiKey: "AIzaSyBEB8oMfBuaPpIKAXIBCBRf1k22JTAAY1E",
       authDomain: "classpick-5e62c.firebaseapp.com",
@@ -95,38 +113,60 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
     // 회원가입
-    document.getElementById("signup-btn").addEventListener("click", () => {
+    document.getElementById("signup-btn").addEventListener("click", async () => {
       const email = document.getElementById("signup-email").value;
       const password = document.getElementById("signup-password").value;
 
-      createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          alert("회원가입 성공: " + userCredential.user.email);
-          // 필요하면 여기서 main.html로 이동 가능
-          // window.location.href = "main.html";
-        })
-        .catch((error) => {
-          alert("회원가입 실패: " + error.message);
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        alert("회원가입 성공: " + user.email);
+
+        // Firestore에 저장
+        await setDoc(doc(db, "users", user.uid), {
+          email: user.email,
+          createdAt: new Date()
         });
+
+        showUsers(); // 회원가입 후 목록 업데이트
+      } catch (error) {
+        alert("회원가입 실패: " + error.message);
+      }
     });
 
     // 로그인 → main.html 이동
-    document.getElementById("login-btn").addEventListener("click", () => {
+    document.getElementById("login-btn").addEventListener("click", async () => {
       const email = document.getElementById("login-email").value;
       const password = document.getElementById("login-password").value;
 
-      signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          alert("로그인 성공: " + userCredential.user.email);
-          // 여기 핵심: main.html로 이동!
-          window.location.href = "main.html";
-        })
-        .catch((error) => {
-          alert("로그인 실패: " + error.message);
-        });
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        alert("로그인 성공: " + userCredential.user.email);
+        window.location.href = "main.html";
+      } catch (error) {
+        alert("로그인 실패: " + error.message);
+      }
     });
+
+    // 회원 목록 표시
+    async function showUsers() {
+      const querySnapshot = await getDocs(collection(db, "users"));
+      const userList = document.getElementById("user-list");
+      userList.innerHTML = "";
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const li = document.createElement("li");
+        li.textContent = data.email;
+        userList.appendChild(li);
+      });
+    }
+
+    // 페이지 열릴 때 목록 표시
+    showUsers();
   </script>
 </body>
 </html>
