@@ -2,30 +2,25 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <!-- 모바일 대응을 위해 꼭 필요 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>회원가입 & 로그인</title>
+  <title>로그인 및 회원가입</title>
   <style>
-    /* 전체 화면 기본 설정 */
     body {
       margin: 0;
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Apple SD Gothic Neo", sans-serif;
       background-color: #f7f7f7;
-    }
-    /* 메인 컨테이너: 가운데 정렬 + 최대 너비 지정 */
-    .container {
-      max-width: 400px; /* 모바일에서 보기 좋은 폭 */
-      margin: 0 auto;
-      padding: 20px;
       text-align: center;
     }
-    /* 타이틀 스타일 */
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
     h2 {
       margin-top: 30px;
-      font-size: 1.4em;
+      font-size: 1.5em;
     }
-    /* 각 폼 박스 스타일 */
     .form {
       background-color: #fff;
       border-radius: 10px;
@@ -37,9 +32,7 @@
       margin-bottom: 15px;
       font-size: 1.2em;
     }
-    /* 입력창 스타일 */
     .form input {
-      display: block;
       width: 100%;
       padding: 12px;
       margin: 8px 0;
@@ -47,13 +40,12 @@
       border: 1px solid #ccc;
       border-radius: 5px;
     }
-    /* 버튼 스타일 */
     .form button {
       width: 100%;
       padding: 14px;
       margin-top: 10px;
       background-color: #4CAF50;
-      color: #fff;
+      color: white;
       border: none;
       border-radius: 5px;
       font-size: 1em;
@@ -62,25 +54,16 @@
     .form button:hover {
       background-color: #45a049;
     }
-    /* 화면이 매우 좁은 기기용 (선택사항) */
-    @media (max-width: 400px) {
-      .container {
-        padding: 10px;
-      }
-      .form h3 {
-        font-size: 1em;
-      }
-    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>회원가입 및 로그인</h2>
+    <h2>로그인 및 회원가입</h2>
 
     <!-- 회원가입 폼 -->
     <div class="form">
       <h3>회원가입</h3>
-      <input type="email" id="signup-email" placeholder="이메일 (example@test.com)" required />
+      <input type="email" id="signup-email" placeholder="이메일" required />
       <input type="password" id="signup-password" placeholder="비밀번호" required />
       <button id="signup-btn">회원가입</button>
     </div>
@@ -88,24 +71,18 @@
     <!-- 로그인 폼 -->
     <div class="form">
       <h3>로그인</h3>
-      <input type="email" id="login-email" placeholder="이메일 (example@test.com)" required />
+      <input type="email" id="login-email" placeholder="이메일" required />
       <input type="password" id="login-password" placeholder="비밀번호" required />
       <button id="login-btn">로그인</button>
     </div>
   </div>
 
-  <!-- Firebase v9+ 모듈 스크립트 (type="module") -->
+  <!-- Firebase SDK v9+ 모듈 방식 -->
   <script type="module">
-    // Firebase SDKs
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-analytics.js";
-    import {
-      getAuth,
-      createUserWithEmailAndPassword,
-      signInWithEmailAndPassword
-    } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
 
-    // === Firebase 설정 (본인 웹 앱 설정) ===
+    // Firebase 설정 (본인 프로젝트 정보 정확히 입력!)
     const firebaseConfig = {
       apiKey: "AIzaSyBEB8oMfBuaPpIKAXIBCBRf1k22JTAAY1E",
       authDomain: "classpick-5e62c.firebaseapp.com",
@@ -116,23 +93,18 @@
       measurementId: "G-BQF4L5PBJ7"
     };
 
-    // Firebase 초기화
     const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
     const auth = getAuth(app);
 
-    // DOM 요소
-    const signupBtn = document.getElementById("signup-btn");
-    const loginBtn = document.getElementById("login-btn");
-
     // 회원가입
-    signupBtn.addEventListener("click", () => {
+    document.getElementById("signup-btn").addEventListener("click", () => {
       const email = document.getElementById("signup-email").value;
       const password = document.getElementById("signup-password").value;
+
       createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           alert("회원가입 성공: " + userCredential.user.email);
-          // 회원가입 직후 메인 화면으로 이동하려면 아래 주석 해제
+          // 필요하면 여기서 main.html로 이동 가능
           // window.location.href = "main.html";
         })
         .catch((error) => {
@@ -140,14 +112,15 @@
         });
     });
 
-    // 로그인
-    loginBtn.addEventListener("click", () => {
+    // 로그인 → main.html 이동
+    document.getElementById("login-btn").addEventListener("click", () => {
       const email = document.getElementById("login-email").value;
       const password = document.getElementById("login-password").value;
+
       signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           alert("로그인 성공: " + userCredential.user.email);
-          // 로그인 성공 시 main.html로 이동
+          // 여기 핵심: main.html로 이동!
           window.location.href = "main.html";
         })
         .catch((error) => {
