@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>학교 인기투표 메인 페이지</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Apple SD Gothic Neo", sans-serif;
+      background-color: #f7f7f7;
+      text-align: center;
+    }
+    .main-container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    h1 {
+      margin-bottom: 30px;
+      font-size: 1.4em;
+    }
+    .button-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .button-list button {
+      width: 100%;
+      padding: 15px;
+      font-size: 1.1em;
+      border: none;
+      border-radius: 5px;
+      background-color: #2196F3;
+      color: #fff;
+      cursor: pointer;
+    }
+    .button-list button:hover {
+      background-color: #0b7dda;
+    }
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <h1>학교 인기투표 메인 페이지</h1>
+    <div class="button-list">
+      <button onclick="location.href='praise_box.html'">익명 칭찬박스</button>
+      <button onclick="location.href='predict_event.html'">예측한 이벤트</button>
+      <button onclick="location.href='keyword_vote.html'">매력 키워드 투표</button>
+      <button onclick="location.href='points_badge.html'">포인트 &amp; 배지</button>
+      <button onclick="location.href='infographic.html'">투표 결과 인포그래픽</button>
+      <button onclick="location.href='avatar_custom.html'">아바타 꾸미기</button>
+      <button onclick="location.href='admin_secure_log.html'">관리자 로그인</button>
+    </div>
+  </div>
+</body>
+</html>
