@@ -28,20 +28,24 @@
       background-color: #45a049;
     }
     .container {
+      /* 가로가 아닌 세로 정렬 */
       display: flex;
-      justify-content: center;
+      flex-direction: column; 
+      align-items: center; 
       margin-top: 20px;
     }
     .form {
-      margin: 0 20px;
+      margin: 10px 0; /* 위아래 간격 */
       border: 1px solid #ccc;
       padding: 20px;
       border-radius: 10px;
+      width: 300px; /* 폼 너비(필요에 따라 조절 가능) */
     }
   </style>
 </head>
 <body>
   <h2>회원가입 및 로그인</h2>
+  
   <div class="container">
     <!-- 회원가입 폼 -->
     <div class="form">
@@ -50,6 +54,7 @@
       <input type="password" id="signup-password" placeholder="비밀번호" required><br>
       <button onclick="signUp()">회원가입</button>
     </div>
+
     <!-- 로그인 폼 -->
     <div class="form">
       <h3>로그인</h3>
