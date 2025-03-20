@@ -1,4 +1,6 @@
-<!DOCTYPE html><html><head><meta charset='UTF-8'><title>avatar_custom.html</title></head><body><h1>아바타 꾸미기</h1><ul id='user-list'><li>로딩 중...</li></ul>
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>avatar_custom.html</title></head><body><h1>아바타 꾸미기 기능</h1>
+<h3>회원 목록</h3>
+<ul id="user-list"><li>로딩 중...</li></ul>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
@@ -28,7 +30,6 @@ async function showUsers() {
     userList.appendChild(li);
   });
 }
-
 showUsers();
 </script>
 </body></html>
