@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>회원가입</title>
+  <title>로그인</title>
   <style>
     body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
     input { padding: 10px; margin: 5px; width: 200px; }
@@ -12,20 +12,16 @@
   </style>
 </head>
 <body>
-  <h2>회원가입</h2>
+  <h2>로그인</h2>
   <input type="email" id="email" placeholder="이메일" required><br>
   <input type="password" id="password" placeholder="비밀번호" required><br>
-  <button onclick="signUp()">회원가입</button>
+  <button onclick="logIn()">로그인</button>
 
-  <!-- Firebase v9 모듈 방식 스크립트 -->
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+  <!-- compat 버전 스크립트 -->
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
   <script>
-    // Firebase에서 필요한 함수들을 사용 (모듈 방식)
-    const { initializeApp } = firebase;
-    const { getAuth, createUserWithEmailAndPassword } = firebase.auth;
-
-    // Firebase 설정
+    // Firebase 설정 (회원가입 때 사용한 설정과 동일)
     const firebaseConfig = {
       apiKey: "AIzaSyBEB8oMfBuaPpIKAXIBCBRf1k22JTAAY1E",
       authDomain: "classpick-5e62c.firebaseapp.com",
@@ -37,21 +33,21 @@
     };
 
     // Firebase 초기화
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    
-    // 회원가입 함수
-    function signUp() {
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // 로그인 함수
+    function logIn() {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
-      createUserWithEmailAndPassword(auth, email, password)
+      auth.signInWithEmailAndPassword(email, password)
       .then((userCredential) => {
-        // 회원가입 성공
-        alert("회원가입 성공: " + userCredential.user.email);
+        // 로그인 성공
+        alert("로그인 성공: " + userCredential.user.email);
       })
       .catch((error) => {
         // 오류 처리
-        alert("회원가입 실패: " + error.message);
+        alert("로그인 실패: " + error.message);
       });
     }
   </script>
