@@ -1,6 +1,5 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <title>실시간 인기투표</title>
@@ -10,7 +9,7 @@
     h2 { text-align: center; color: #2c3e50; }
     .card { background: #ffffff; border-radius: 10px; padding: 10px; margin: 10px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); text-align: center; }
     img { width: 80px; height: 80px; border-radius: 50%; }
-    button { margin-top: 10px; padding: 8px 16px; background: #ff4081; color: white; border: none; border-radius: 5px; font-size: 14px; }
+    button { margin-top: 10px; padding: 8px 16px; background: #ff4081; color: white; border: none; border-radius: 5px; font-size: 14px; cursor: pointer; }
   </style>
   <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
@@ -24,19 +23,16 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-  </script>
-</head>
-<body>
-  <h2>실시간 인기투표</h2>
-  <div id="candidateList">후보 불러오는 중...</div>
-
-  <script>
+    
     auth.onAuthStateChanged(user => {
       if (!user) {
         alert("로그인이 필요합니다.");
         return;
       }
+      loadCandidates();
+    });
 
+    function loadCandidates() {
       db.collection("users").get().then(snapshot => {
         let html = "";
         snapshot.forEach(doc => {
@@ -52,20 +48,32 @@
           `;
         });
         document.getElementById("candidateList").innerHTML = html;
+      }).catch(error => {
+        console.error("후보 불러오기 실패:", error);
+        alert("후보 목록을 불러오는 데 실패했습니다.");
       });
-    });
+    }
 
     function vote(candidateId) {
       const user = auth.currentUser;
-      if (!user) return alert("로그인 필요");
+      if (!user) {
+        return alert("로그인이 필요합니다.");
+      }
       db.collection("votes").add({
         candidateId,
         voterId: user.uid,
         time: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
         alert("투표 완료!");
+      }).catch(error => {
+        console.error("투표 실패:", error);
+        alert("투표 중 오류가 발생했습니다. 다시 시도해주세요.");
       });
     }
   </script>
+</head>
+<body>
+  <h2>실시간 인기투표</h2>
+  <div id="candidateList">후보 불러오는 중...</div>
 </body>
 </html>
