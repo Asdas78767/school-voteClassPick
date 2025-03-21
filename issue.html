@@ -101,14 +101,15 @@
   </div>
 
   <script>
+    // Firebase 설정
     const firebaseConfig = {
       apiKey: "AIzaSyBEB8oMfBuaPpIKAXIBCBRf1k22JTAAY1E",
       authDomain: "classpick-5e62c.firebaseapp.com",
       projectId: "classpick-5e62c",
       storageBucket: "classpick-5e62c.firebasestorage.app",
       messagingSenderId: "545042496728",
-      appId: "1:545042496728:web:bbae1d57038e5aa3716bad",
-      measurementId: "G-31BZ1Y7L9X"
+      appId: "1:545042496728:web:96cd5e5ca4c0b465716bad",
+      measurementId: "G-GHS8YZSZVP"
     };
 
     firebase.initializeApp(firebaseConfig);
@@ -119,7 +120,6 @@
     const adminEmail = "mingyeolkim637@gmail.com";
     let currentUser = null;
 
-    // 로그인 기능
     function login() {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
@@ -137,7 +137,6 @@
         });
     }
 
-    // 자동 저장 기능
     function enableAutoSave(uid) {
       let timeout;
       const titleInput = document.getElementById('title');
