@@ -5,64 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>학교 이슈 게시판</title>
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
-      background-color: #f0f0f0;
-      text-align: center;
-    }
-    .container {
-      max-width: 500px;
-      margin: 0 auto;
-      padding: 30px 20px;
-    }
+    body { margin: 0; padding: 0; font-family: sans-serif; background: #f0f0f0; text-align: center; }
+    .container { max-width: 500px; margin: 0 auto; padding: 30px 20px; }
     h2 { margin-bottom: 20px; color: #2c3e50; }
-
-    .box {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      text-align: left;
-    }
-    input, textarea {
-      width: 100%;
-      margin-top: 10px;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-    }
-    button {
-      margin-top: 10px;
-      padding: 12px;
-      width: 100%;
-      background-color: #4CAF50;
-      color: white;
-      font-size: 16px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    .delete-btn {
-      background-color: #e53935;
-      margin-top: 5px;
-    }
-    .issue-item {
-      padding: 10px 0;
-      border-bottom: 1px solid #eee;
-    }
-    #status {
-      font-size: 14px;
-      color: gray;
-      margin-top: 5px;
-    }
+    .box { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: left; }
+    input, textarea { width: 100%; margin-top: 10px; padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
+    button { margin-top: 10px; padding: 12px; width: 100%; background-color: #4CAF50; color: white; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background-color: #45a049; }
+    .delete-btn { background-color: #e53935; margin-top: 5px; }
+    .issue-item { padding: 10px 0; border-bottom: 1px solid #eee; }
+    #status { font-size: 14px; color: gray; margin-top: 5px; }
   </style>
 
   <!-- Firebase SDK -->
@@ -76,15 +28,7 @@
   <div class="container">
     <h2>학교 이슈 게시판</h2>
 
-    <!-- 로그인 박스 -->
-    <div class="box" id="loginBox">
-      <h3>로그인</h3>
-      <input type="email" id="email" placeholder="이메일 입력" />
-      <input type="password" id="password" placeholder="비밀번호 입력" />
-      <button onclick="login()">로그인</button>
-    </div>
-
-    <!-- 작성 박스 -->
+    <!-- 글쓰기 박스 -->
     <div class="box" id="writeBox" style="display:none;">
       <h3>이슈 작성</h3>
       <input type="text" id="title" placeholder="제목 입력" />
@@ -101,7 +45,6 @@
   </div>
 
   <script>
-    // Firebase 설정
     const firebaseConfig = {
       apiKey: "AIzaSyBEB8oMfBuaPpIKAXIBCBRf1k22JTAAY1E",
       authDomain: "classpick-5e62c.firebaseapp.com",
@@ -120,22 +63,18 @@
     const adminEmail = "mingyeolkim637@gmail.com";
     let currentUser = null;
 
-    function login() {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-
-      auth.signInWithEmailAndPassword(email, password)
-        .then(() => {
-          currentUser = auth.currentUser;
-          document.getElementById('loginBox').style.display = 'none';
-          document.getElementById('writeBox').style.display = 'block';
-          enableAutoSave(currentUser.uid);
-          loadIssues();
-        })
-        .catch(error => {
-          alert("로그인 실패: " + error.message);
-        });
-    }
+    // 로그인 상태 확인 → 자동으로 글쓰기+목록 표시
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        currentUser = user;
+        document.getElementById('writeBox').style.display = 'block';
+        enableAutoSave(user.uid);
+        loadIssues();
+      } else {
+        alert("로그인이 필요합니다.");
+        location.href = "index.html";
+      }
+    });
 
     function enableAutoSave(uid) {
       let timeout;
@@ -155,7 +94,6 @@
     }
 
     function submitIssue() {
-      if (!currentUser) return alert("로그인 필요");
       saveIssue(currentUser.uid, false);
     }
 
@@ -213,12 +151,8 @@
     function deleteIssue(id) {
       if (!confirm("정말로 삭제하시겠습니까?")) return;
       db.collection("issues").doc(id).delete()
-        .then(() => {
-          alert("삭제 완료!");
-        })
-        .catch(err => {
-          alert("삭제 실패: " + err.message);
-        });
+        .then(() => { alert("삭제 완료!"); })
+        .catch(err => { alert("삭제 실패: " + err.message); });
     }
   </script>
 </body>
