@@ -46,13 +46,13 @@
 
   <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyBEB8oMfBuaPpIKAXIBCBRf1k22JTAAY1E",
-      authDomain: "classpick-5e62c.firebaseapp.com",
-      projectId: "classpick-5e62c",
-      storageBucket: "classpick-5e62c.firebasestorage.app",
-      messagingSenderId: "545042496728",
-      appId: "1:545042496728:web:96cd5e5ca4c0b465716bad",
-      measurementId: "G-GHS8YZSZVP"
+      apiKey: process.env.FIREBASE_API_KEY,
+      authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+      appId: process.env.FIREBASE_APP_ID,
+      measurementId: process.env.FIREBASE_MEASUREMENT_ID
     };
 
     firebase.initializeApp(firebaseConfig);
@@ -80,7 +80,6 @@
       let timeout;
       const titleInput = document.getElementById('title');
       const contentInput = document.getElementById('content');
-      const status = document.getElementById('status');
 
       function saveAuto() {
         clearTimeout(timeout);
@@ -102,7 +101,10 @@
       const content = document.getElementById('content').value.trim();
       const status = document.getElementById('status');
 
-      if (!title && !content) return;
+      if (!title || !content) {
+        status.innerText = "제목과 내용을 입력해주세요.";
+        return;
+      }
 
       db.collection("issues").add({
         title,
@@ -110,15 +112,20 @@
         authorId: uid,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => {
-        status.innerText = isAuto ? "자동 저장 완료!" : "작성 완료!";
+        updateStatus(isAuto ? "자동 저장 완료!" : "작성 완료!");
         if (!isAuto) {
           document.getElementById('title').value = "";
           document.getElementById('content').value = "";
         }
-        setTimeout(() => { status.innerText = "자동 저장 대기 중..."; }, 2000);
       }).catch(() => {
-        status.innerText = "저장 실패!";
+        updateStatus("저장 실패!");
       });
+    }
+
+    function updateStatus(message) {
+      const status = document.getElementById('status');
+      status.innerText = message;
+      setTimeout(() => { status.innerText = "자동 저장 대기 중..."; }, 2000);
     }
 
     function loadIssues() {
